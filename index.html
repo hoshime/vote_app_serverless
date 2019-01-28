@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,700,400italic' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
+	<script src="js/modernizr.js"></script> <!-- Modernizr -->
+  
+	<title>We are TECH.C Vote App</title>
+</head>
+<body style="align-content: center">
+	<div class="cd-intro-block">
+		<div class="content-wrapper">
+            	<img src="img/logo_pc.png">
+			<h1>We are TECH.Cへようこそ</h1>
+			<a href="#0" class='cd-btn' data-action="show-projects">Show projects</a>
+		</div>
+	</div> <!-- .cd-intro-block -->
+
+	<div class="cd-projects-wrapper">
+		<ul class="cd-slider">
+			<li class="current">
+				<a href="S3Content/vote.html">
+					<img src="img/img_avatar.png" alt="project image">
+					<div class="project-info">
+						<h2> <a href="S3Content/vote.html">茨城先生チーム</a></h2>
+					</div>
+				</a>
+			</li>
+
+			<li>
+				<a href="S3Content/vote.html">
+					<img src="img/img_avatar.png" alt="project image">
+					<div class="project-info">
+                        <h2><a href="S3Content/vote.html">古庄先生チーム</a></h2>
+					</div>
+				</a>
+			</li>
+
+			<li>
+				<a href="S3Content/vote.html">
+					<img src="img/img_avatar.png" alt="project image">
+					<div class="project-info">
+                        <h2><a href="S3Content/vote.html">木村先生チーム</a></h2>
+					</div>
+				</a>
+			</li>
+
+			<li>
+				<a href="S3Content/vote.html">
+					<img src="img/img_avatar.png" alt="project image">
+					<div class="project-info">
+                        <h2><a href="S3Content/vote.html">佐藤先生チーム</a></h2>
+                        <!--<p><a href="https://www.w3schools.com" target="_blank">Visit W3Schools</a></p>
+-->
+					</div>
+				</a>
+			</li>
+
+			<li>
+				<a href="S3Content/vote.html">
+					<img src="img/img_avatar.png" alt="project image">
+					<div class="project-info">
+                        <h2><a href="S3Content/vote.html">大谷先生チーム</a></h2>
+					</div>
+				</a>
+			</li>
+		</ul>
+
+		<ul class="cd-slider-navigation cd-img-replace">
+			<li><a href="#0" class="prev inactive">Prev</a></li>
+			<li><a href="#0" class="next">Next</a></li>
+		</ul> <!-- .cd-slider-navigation -->
+	</div> <!-- .cd-projects-wrapper -->
+
+	<div class="cd-project-content">
+		<div>
+    <img src="../img/logo_pc.png">
+	<h1>IT プロジェクト VOTE !</h1>
+	
+	<h1>とても良かったプロジェクト</h1>
+	<form action="https://kfb9dlbm36.execute-api.us-west-2.amazonaws.com/prod/vote" method="post" onsubmit="hideForm()">
+		<div class="center">
+			<div>
+			<input type="radio" name="vote" value="none" checked id="radio1"><label for="radio1">NO チーム</label>
+			</div><div>
+			<input type="radio" name="vote" value="ibaraki" id="radio2"><label for="radio2">茨城先生チーム</label>
+			</div><div>
+			<input type="radio" name="vote" value="kimura" id="radio3"><label for="radio3">木村先生チーム</label>
+			</div><div>
+			<input type="radio" name="vote" value="furusyou" id="radio4"><label for="radio4">古庄先生チーム </label>
+			</div><div>
+  		  	<input type="radio" name="vote" value="satou" id="radio5"><label for="radio5">佐藤先生チーム</label>
+			</div><div>
+			<input type="radio" name="vote" value="otani" checked id="radio1"><label for="radio1">大谷先生チーム</label>
+            
+			</div>
+             
+		</div>
+        
+        <div style="padding-top: 35px;">
+        
+    </div>
+      <div style="padding-top: 20px;"><input type="submit" value="Submit" /></div>
+        
+      
+        
+	</form>
+	<div class="thanks" style="display:none">Vote ありがとうございました。</div>
+	
+	<h1>結果</h1>
+	<svg class="chart"></svg>
+	
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var createCORSRequest = function(method, url) {
+	var xhr = new XMLHttpRequest();
+	if ("withCredentials" in xhr) {
+		// Most browsers.
+		xhr.open(method, url, true);
+	} else if (typeof XDomainRequest != "undefined") {
+		// IE8 & IE9
+		xhr = new XDomainRequest();
+		xhr.open(method, url);
+	} else {
+		// CORS not supported.
+		xhr = null;
+	}
+	return xhr;
+};
+
+var loadXMLDoc = function(autoRefresh){
+	var width = 600,
+    	barHeight = 50,
+		padding = 60;
+	
+	var url = 'data.json';
+	var method = 'GET';
+	var xhr = createCORSRequest(method, url);
+
+	xhr.onload = function(req) {	  
+		  var data = JSON.parse(this.responseText).Items;
+		  
+		  data = data.sort((a,b) => b.tally - a.tally);
+		  
+		  var x = d3.scaleLinear()
+		      .domain([0, d3.max(data, function(d) { return d.tally + padding; })])
+		      .range([0, width]);
+		  
+		  var chart = d3.select(".chart")
+		      .attr("width", width)
+		      .attr("height", barHeight * data.length);
+			  
+		  chart.selectAll("*").remove()
+
+		  var bar = chart.selectAll("g")
+		      .data(data)
+		    .enter().append("g")
+		      .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+		  
+		  bar.append("rect")
+		      .attr("width",  function(d) { return x(d.tally) + padding; })
+		      .attr("height", barHeight - 1);
+
+		  bar.append("text")
+		      .attr("x", function(d) { return x(d.tally) + padding - 3; })
+		      .attr("y", barHeight / 2)
+		      .attr("dy", ".35em")
+		      .text(function(d) { return d.candidate + ': ' + d.tally; });
+		  
+	};
+
+	xhr.onerror = function() {
+	  // Error code goes here.
+	};
+
+  	xhr.send();
+	
+	//AutoRefresh
+	if(autoRefresh){
+		window.setTimeout(loadXMLDoc, 3000, true);
+	}
+}
+
+function type(d) {
+  d.votes = +d.votes; // coerce to number
+  return d;
+}
+
+function hideForm(){
+	d3.select("form")
+		.style("display", "none");
+	d3.select(".thanks")
+		.style("display", "block");
+	window.setTimeout(loadXMLDoc, 1200, false);
+}
+
+loadXMLDoc(true);
+</script>
+            
+<script src="js/jquery-2.1.4.js"></script>
+<script src="js/jquery.mobile.custom.min.js"></script>
+<script src="js/main.js"></script> <!-- Resource jQuery -->
+</body>
+</html>
